@@ -1,0 +1,250 @@
+-- Create HR Fact Table
+
+CREATE TABLE HR (
+    [EmployeeID] INT NOT NULL,
+    [Date] DATE NOT NULL,
+    [Salary] DECIMAL(18, 2) NOT NULL,
+    [Training Hours] INT NOT NULL,
+    [Performance Score] DECIMAL(5, 2) NOT NULL,
+    CONSTRAINT PK_HR PRIMARY KEY CLUSTERED ([EmployeeID], [Date])
+);
+
+-- Create Employee Dimention Table
+DROP TABLE Employees
+CREATE TABLE Employees (
+    [EmployeeID] INT PRIMARY KEY,
+    [EmployeeName] NVARCHAR(100) NOT NULL,
+    [HireDate] DATE,
+    [TerminationDate] DATE,
+    [JobTitleID] INT,
+    [DepartmentID] INT,
+    [Gender] NVARCHAR(10),
+    [DateOfBirth] DATE,
+    [ContactInformation] NVARCHAR(255)
+);
+
+-- Create Departments Dimention Table
+CREATE TABLE Departments (
+    [DepartmentID] INT PRIMARY KEY,
+    [DepartmentName] NVARCHAR(100) NOT NULL,
+    [ManagerID] INT,
+    [Location] NVARCHAR(100)
+);
+
+-- Create Job Titles Dimention Table
+CREATE TABLE JobTitles (
+    [JobTitleID] INT PRIMARY KEY,
+    [JobTitleName] NVARCHAR(100) NOT NULL,
+    [JobDescription] NVARCHAR(255),
+    [SalaryGrade] INT
+);
+-- Create Salaries Dimention Table
+CREATE TABLE Salaries (
+    [EmployeeID] INT,
+    [SalaryAmount] DECIMAL(18, 2) NOT NULL,
+    [EffectiveDate] DATE NOT NULL,
+    [TerminationDate] DATE,
+    [Currency] NVARCHAR(3) NOT NULL
+);
+-- Create Training Dimention Table
+CREATE TABLE Training (
+    [TrainingID] INT PRIMARY KEY,
+    [EmployeeID] INT,
+    [TrainingName] NVARCHAR(100) NOT NULL,
+    [TrainingType] NVARCHAR(50),
+    [TrainingDate] DATE,
+    [TrainingDuration] INT
+);
+
+-- Insert Values to HR table
+
+INSERT INTO HR ([EmployeeID], [Date], [Salary], [Training Hours], [Performance Score])
+VALUES
+    (1, '2023-01-01', 50000.00, 10, 4.5),
+    (2, '2023-02-01', 60000.00, 12, 4.8),
+    (3, '2023-01-01', 55000.00, 8, 4.3),
+    (4, '2023-01-01', 52000.00, 9, 4.4),
+    (5, '2023-05-01', 48000.00, 11, 4.6),
+    (6, '2023-01-01', 62000.00, 14, 4.9),
+    (7, '2022-01-01', 51000.00, 10, 4.2),
+    (8, '2023-06-01', 53000.00, 8, 4.3),
+    (9, '2023-01-01', 49000.00, 9, 4.4),
+    (10, '2022-01-01', 52000.00, 10, 4.5),
+    (21, '2023-01-02', 51000.00, 8, 4.1),
+    (22, '2023-01-02', 59000.00, 12, 4.7),
+    (23, '2023-08-02', 54000.00, 9, 4.3),
+    (24, '2023-01-02', 53000.00, 11, 4.6),
+    (25, '2023-01-02', 48000.00, 10, 4.4),
+    (26, '2023-01-02', 61000.00, 14, 4.9),
+    (27, '2023-01-02', 50000.00, 8, 4.2),
+    (28, '2023-01-02', 52000.00, 9, 4.4),
+    (29, '2022-03-02', 50000.00, 10, 4.5),
+    (30, '2022-09-02', 54000.00, 7, 4.0);
+
+	-- Sample data for the Employees dimension table
+	TRUNCATE TABLE Employees
+INSERT INTO Employees ([EmployeeID], [EmployeeName], [HireDate], [TerminationDate], [JobTitleID], [DepartmentID], [Gender], [DateOfBirth], [ContactInformation])
+VALUES
+    (1, 'John Doe', '2020-01-15', '2022-01-15', 1, 101, 'Male', '1985-05-10', 'john.doe@example.com'),
+    (2, 'Jane Smith', '2019-11-20', '2022-11-20', 2, 101, 'Female', '1990-03-22', 'jane.smith@example.com'),
+    (3, 'Michael Johnson', '2021-03-05', '2022-03-05', 3, 102, 'Male', '1988-09-15', 'michael.johnson@example.com'),
+    (4, 'Emily Brown', '2018-07-12', NULL, 4, 102, 'Female', '1992-12-07', 'emily.brown@example.com'),
+    (5, 'David Wilson', '2022-02-28', NULL, 5, 103, 'Male', '1995-08-18', 'david.wilson@example.com'),
+    (6, 'Sarah Lee', '2017-09-10', NULL, 6, 103, 'Female', '1990-06-25', 'sarah.lee@example.com'),
+    (7, 'Robert Anderson', '2020-08-15', NULL, 7, 104, 'Male', '1987-04-14', 'robert.anderson@example.com'),
+    (8, 'Olivia Kim', '2019-05-01', '2022-05-01', 8, 104, 'Female', '1993-01-03', 'olivia.kim@example.com'),
+    (9, 'William Martinez', '2021-06-25', NULL, 9, 105, 'Male', '1986-07-28', 'william.martinez@example.com'),
+    (10, 'Ava Hernandez', '2018-12-10', NULL, 10, 105, 'Female', '1991-11-14', 'ava.hernandez@example.com'),
+    (11, 'James Taylor', '2022-04-30', '2023-04-30', 1, 101, 'Male', '1989-02-02', 'james.taylor@example.com'),
+    (12, 'Sophia Davis', '2017-03-18', NULL, 2, 101, 'Female', '1994-07-19', 'sophia.davis@example.com'),
+    (13, 'Alexander Hernandez', '2020-11-08', NULL, 3, 102, 'Male', '1984-12-30', 'alexander.hernandez@example.com'),
+    (14, 'Mia Rodriguez', '2019-01-05', '2020-01-05', 4, 102, 'Female', '1996-05-08', 'mia.rodriguez@example.com'),
+    (15, 'Benjamin Brown', '2021-07-20', NULL, 5, 103, 'Male', '1987-09-12', 'benjamin.brown@example.com'),
+    (16, 'Evelyn Jones', '2018-10-11', NULL, 6, 103, 'Female', '1992-03-28', 'evelyn.jones@example.com'),
+    (17, 'Daniel Smith', '2019-09-03', NULL, 7, 104, 'Male', '1989-11-25', 'daniel.smith@example.com'),
+    (18, 'Chloe Wilson', '2017-04-15', '2019-04-15', 8, 104, 'Female', '1993-07-02', 'chloe.wilson@example.com'),
+    (19, 'Matthew Johnson', '2022-05-12', '2023-02-12', 9, 105, 'Male', '1985-03-17', 'matthew.johnson@example.com'),
+    (20, 'Grace Lee', '2018-08-22', NULL, 10, 105, 'Female', '1990-10-29', 'grace.lee@example.com'),
+    (21, 'Liam Anderson', '2019-10-17', '2021-10-17', 1, 101, 'Male', '1993-06-07', 'liam.anderson@example.com'),
+    (22, 'Emma Martinez', '2017-07-28', NULL, 2, 101, 'Female', '1996-09-11', 'emma.martinez@example.com'),
+    (23, 'Noah Taylor', '2020-03-12', '2022-03-12', 3, 102, 'Male', '1988-04-03', 'noah.taylor@example.com'),
+    (24, 'Ava Rodriguez', '2017-02-25', '2023-02-25', 4, 102, 'Female', '1991-12-19', 'ava.rodriguez@example.com'),
+    (25, 'Liam Smith', '2019-10-18', NULL, 1, 101, 'Male', '1993-06-07', 'liam.anderson@example.com');
+
+	-- Sample data for the Departments dimension table
+INSERT INTO Departments ([DepartmentID], [DepartmentName], [ManagerID], [Location])
+VALUES
+    (101, 'Human Resources', 1, 'New York'),
+    (102, 'Finance', 3, 'Chicago'),
+    (103, 'Sales', 5, 'Los Angeles'),
+    (104, 'Marketing', 7, 'San Francisco'),
+    (105, 'Engineering', 9, 'Seattle'),
+    (106, 'Operations', 11, 'Dallas'),
+    (107, 'Customer Service', 13, 'Miami'),
+    (108, 'Research and Development', 15, 'Boston'),
+    (109, 'Legal', 17, 'Washington, D.C.'),
+    (110, 'Information Technology', 19, 'Denver'),
+    (111, 'Product Management', 21, 'Austin'),
+    (112, 'Supply Chain', 23, 'Atlanta'),
+    (113, 'Quality Assurance', 25, 'Phoenix'),
+    (114, 'Logistics', 27, 'Houston'),
+    (115, 'Facilities Management', 29, 'San Diego'),
+    (116, 'Public Relations', 31, 'Philadelphia'),
+    (117, 'Customer Relations', 33, 'Detroit'),
+    (118, 'Procurement', 35, 'Minneapolis'),
+    (119, 'Internal Audit', 37, 'San Jose'),
+    (120, 'Health and Safety', 39, 'Portland'),
+    (121, 'Business Development', 41, 'Las Vegas'),
+    (122, 'Corporate Communications', 43, 'Nashville'),
+    (123, 'Strategic Planning', 45, 'Memphis'),
+    (124, 'Product Development', 47, 'Louisville'),
+    (125, 'Finance Planning and Analysis', 49, 'Tucson'),
+    (126, 'Information Security', 51, 'Albuquerque'),
+    (127, 'Human Capital Management', 53, 'Oklahoma City'),
+    (128, 'Research and Innovation', 55, 'El Paso'),
+    (129, 'Legal Affairs', 57, 'Milwaukee'),
+    (130, 'IT Operations', 59, 'Charlotte');
+
+	-- Sample data for the JobTitles dimension table
+INSERT INTO JobTitles ([JobTitleID], [JobTitleName], [JobDescription], [SalaryGrade])
+VALUES
+    (1, 'HR Manager', 'Manages human resources operations', 7),
+    (2, 'Financial Analyst', 'Analyzes financial data and prepares reports', 6),
+    (3, 'Sales Representative', 'Sells products and services', 5),
+    (4, 'Marketing Specialist', 'Develops marketing campaigns', 6),
+    (5, 'Software Engineer', 'Develops software applications', 8),
+    (6, 'Operations Manager', 'Manages day-to-day operations', 7),
+    (7, 'Customer Service Representative', 'Assists customers with inquiries', 5),
+    (8, 'Research Scientist', 'Conducts research and experiments', 8),
+    (9, 'Legal Counsel', 'Provides legal advice and representation', 9),
+    (10, 'IT Support Specialist', 'Provides technical support', 5),
+    (11, 'Product Manager', 'Manages product development', 8),
+    (12, 'Supply Chain Analyst', 'Analyzes supply chain data', 7),
+    (13, 'QA Tester', 'Tests software for quality assurance', 6),
+    (14, 'Logistics Coordinator', 'Coordinates logistics operations', 6),
+    (15, 'Facilities Manager', 'Manages facility maintenance', 7),
+    (16, 'Public Relations Specialist', 'Manages public relations efforts', 6),
+    (17, 'Customer Relations Manager', 'Manages customer relations', 7),
+    (18, 'Procurement Specialist', 'Handles procurement activities', 6),
+    (19, 'Internal Auditor', 'Performs internal audits', 7),
+    (20, 'Safety Officer', 'Ensures workplace safety', 6),
+    (21, 'Business Development Manager', 'Leads business development efforts', 8),
+    (22, 'Corporate Communications Specialist', 'Handles corporate communications', 6),
+    (23, 'Strategic Planner', 'Develops strategic plans', 8),
+    (24, 'Product Development Engineer', 'Engineers product development', 8),
+    (25, 'Financial Planning Analyst', 'Analyzes financial planning', 7),
+    (26, 'Information Security Analyst', 'Ensures information security', 8),
+    (27, 'HR Specialist', 'Provides HR support', 6),
+    (28, 'Research and Innovation Manager', 'Manages research and innovation', 8),
+    (29, 'Legal Advisor', 'Offers legal advice', 9),
+    (30, 'IT Operations Manager', 'Manages IT operations', 8);
+
+	-- Sample data for the Salaries dimension table
+INSERT INTO Salaries ([EmployeeID], [SalaryAmount], [EffectiveDate], [TerminationDate], [Currency])
+VALUES
+    (1, 60000.00, '2020-01-01', NULL, 'USD'),
+    (2, 65000.00, '2019-12-15', NULL, 'USD'),
+    (3, 55000.00, '2020-02-01', NULL, 'USD'),
+    (4, 52000.00, '2020-03-01', NULL, 'USD'),
+    (5, 58000.00, '2019-11-01', NULL, 'USD'),
+    (6, 70000.00, '2020-01-15', NULL, 'USD'),
+    (7, 53000.00, '2020-04-01', NULL, 'USD'),
+    (8, 60000.00, '2020-03-15', NULL, 'USD'),
+    (9, 56000.00, '2020-02-15', NULL, 'USD'),
+    (10, 62000.00, '2019-10-01', NULL, 'USD'),
+    (11, 61000.00, '2020-01-01', NULL, 'USD'),
+    (12, 67000.00, '2019-11-15', '2020-11-15', 'USD'),
+    (13, 57000.00, '2020-02-01', NULL, 'USD'),
+    (14, 54000.00, '2020-03-01', NULL, 'USD'),
+    (15, 59000.00, '2020-01-15', NULL, 'USD'),
+    (16, 54000.00, '2020-04-01', NULL, 'USD'),
+    (17, 60000.00, '2020-03-15', NULL, 'USD'),
+    (18, 56000.00, '2020-02-15', NULL, 'USD'),
+    (19, 62000.00, '2019-10-01', NULL, 'USD'),
+    (20, 63000.00, '2020-01-01', '2022-01-01', 'USD'),
+    (21, 64000.00, '2019-12-15', NULL, 'USD'),
+    (22, 55000.00, '2020-02-01', NULL, 'USD'),
+    (23, 52000.00, '2020-03-01', NULL, 'USD'),
+    (24, 59000.00, '2019-11-01', NULL, 'USD'),
+    (25, 70000.00, '2020-01-15', NULL, 'USD'),
+    (26, 57000.00, '2020-04-01', NULL, 'USD'),
+    (27, 58000.00, '2020-03-15', NULL, 'USD'),
+    (28, 56000.00, '2020-02-15', '2023-02-15', 'USD'),
+    (29, 62000.00, '2019-10-01', NULL, 'USD'),
+    (30, 61000.00, '2020-01-01', NULL, 'USD');
+
+	-- Sample data for the Training dimension table
+INSERT INTO Training ([TrainingID], [EmployeeID], [TrainingName], [TrainingType], [TrainingDate], [TrainingDuration])
+VALUES
+    (1, 1, 'HR Orientation', 'Onboarding', '2020-02-05', 8),
+    (2, 2, 'Finance Fundamentals', 'Workshop', '2019-12-10', 12),
+    (3, 3, 'Sales Techniques', 'Seminar', '2020-03-20', 10),
+    (4, 4, 'Marketing Strategies', 'Course', '2020-04-15', 16),
+    (5, 5, 'Software Development Bootcamp', 'Training Program', '2019-11-02', 240),
+    (6, 6, 'Operations Management', 'Workshop', '2020-01-25', 14),
+    (7, 7, 'Customer Service Excellence', 'Seminar', '2020-04-05', 8),
+    (8, 8, 'Research Methods', 'Course', '2020-03-15', 20),
+    (9, 9, 'Legal Compliance', 'Training Program', '2020-02-10', 160),
+    (10, 10, 'IT Troubleshooting', 'Workshop', '2019-10-20', 12),
+    (11, 11, 'Product Management Essentials', 'Seminar', '2020-02-28', 10),
+    (12, 12, 'Supply Chain Optimization', 'Course', '2019-11-15', 18),
+    (13, 13, 'Software Quality Assurance', 'Training Program', '2020-01-10', 160),
+    (14, 14, 'Logistics and Inventory Management', 'Workshop', '2020-03-08', 14),
+    (15, 15, 'Facility Maintenance Training', 'Seminar', '2020-02-12', 8),
+    (16, 16, 'Public Relations Strategies', 'Course', '2020-04-18', 16),
+    (17, 17, 'Customer Relations Management', 'Training Program', '2020-03-05', 160),
+    (18, 18, 'Procurement Best Practices', 'Workshop', '2019-12-01', 12),
+    (19, 19, 'Internal Audit Procedures', 'Seminar', '2020-01-22', 10),
+    (20, 20, 'Workplace Safety Training', 'Course', '2020-02-15', 8),
+    (21, 21, 'Business Development Strategies', 'Training Program', '2020-04-30', 160),
+    (22, 22, 'Corporate Communication Skills', 'Workshop', '2019-11-05', 12),
+    (23, 23, 'Strategic Planning Workshop', 'Seminar', '2020-03-10', 10),
+    (24, 24, 'Product Development Techniques', 'Course', '2020-02-18', 18),
+    (25, 25, 'Financial Planning and Analysis', 'Training Program', '2019-10-25', 160),
+    (26, 26, 'Information Security Awareness', 'Workshop', '2020-01-30', 12),
+    (27, 27, 'HR Policies and Procedures', 'Seminar', '2020-04-20', 10),
+    (28, 28, 'Research and Innovation Workshop', 'Course', '2020-03-02', 16),
+    (29, 29, 'Legal Ethics and Compliance', 'Training Program', '2020-02-08', 160),
+    (30, 30, 'IT Operations Management', 'Workshop', '2019-12-12', 14);
+
+	
