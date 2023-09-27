@@ -1,0 +1,16 @@
+Introduction:
+The HR Management Database project is a real-life, practical demonstration of my SQL skills and database management capabilities. It simulates a comprehensive HR (Human Resources) system designed to streamline various HR functions within an organisation. In this project, I have created a relational database that models employee information, departments, job titles, training records, salaries, performance reviews, and more.
+
+Purpose:
+The primary purpose of this project is to showcase my proficiency in designing and managing complex databases and my ability to write mid-complex level SQL queries. It serves as a tangible representation of my skills to potential employers and clients, demonstrating my competence in the following areas:
+
+Data Modeling: The project involves creating a well-structured database schema that accurately reflects real-world HR data and relationships. This demonstrates my ability to design databases that meet the specific needs of organisations.
+
+Data Population: I have populated the database with diverse and realistic sample data, ensuring it covers a wide range of HR scenarios. This illustrates my capability to manage data effectively.
+
+Querying: The project includes a variety of SQL queries that involve multiple tables, filtering, aggregation, and data analysis. These queries showcase my proficiency in writing SQL code for complex data retrieval and manipulation tasks.
+
+Optimization: I have considered database performance by creating views and indexes where necessary. This demonstrates my commitment to optimizing database operations for efficiency.
+
+Documentation: The project is well-documented, providing comprehensive explanations of the schema, queries, and database operations. This reflects my dedication to clarity and transparency in database management.
+
