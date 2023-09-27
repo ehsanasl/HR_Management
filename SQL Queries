@@ -1,0 +1,414 @@
+-- 1) Employee Performance Analysis:
+
+-- Retrieve a list of employees along with their performance scores
+
+SELECT Employees.[EmployeeID],
+Employees.[EmployeeName],
+HR.[Performance Score]
+
+FROM Employees JOIN HR ON
+Employees.[EmployeeID]=HR.[EmployeeID]
+Order by HR.[Performance Score] DESC
+
+-- The average performance score for each department.
+
+SELECT
+AVG(HR.[Performance Score]) AS AvgPerformanceScore,
+Departments.[DepartmentID],
+Departments.[DepartmentName]
+
+FROM
+HR
+JOIN
+Employees ON Employees.[EmployeeID]=HR.[EmployeeID]
+JOIN
+Departments ON Employees.[DepartmentID] = Departments.[DepartmentID]
+
+GROUP by
+Departments.[DepartmentID],
+Departments.[DepartmentName]
+
+-- 2) Salary Analysis:
+
+-- The highest and lowest-paid employees in the organization.
+
+-- Lowest Paid
+SELECT TOP 1 WITH TIES
+Employees.[EmployeeID], Employees.[EmployeeName], Salaries.[SalaryAmount]
+FROM Employees
+JOIN Salaries ON Employees.[EmployeeID]= Salaries.[EmployeeID]
+ORDER BY Salaries.[SalaryAmount] ASC
+
+-- Highest Paid
+SELECT TOP 1 WITH TIES
+Employees.[EmployeeID], Employees.[EmployeeName], Salaries.[SalaryAmount]
+FROM Employees
+JOIN Salaries ON Employees.[EmployeeID]= Salaries.[EmployeeID]
+ORDER BY Salaries.[SalaryAmount] DESC
+
+-- The total salary expense for the company for after 2019.
+
+SELECT SUM(Salaries.[SalaryAmount]) AS TotalSalary
+FROM Salaries
+WHERE [EffectiveDate] >= '2019-01-01'
+
+-- Identify employees whose salary has increased or decreased over time.
+
+SELECT
+    E.[EmployeeID],
+    E.[EmployeeName],
+    S1.[EffectiveDate] AS StartDate,
+    S2.[EffectiveDate] AS EndDate,
+    S1.[SalaryAmount] AS StartSalary,
+    S2.[SalaryAmount] AS EndSalary
+FROM
+    Employees E
+JOIN
+    Salaries S1 ON E.[EmployeeID] = S1.[EmployeeID]
+JOIN
+    Salaries S2 ON E.[EmployeeID] = S2.[EmployeeID]
+WHERE
+    S1.[EffectiveDate] < S2.[EffectiveDate]
+    AND S1.[SalaryAmount] < S2.[SalaryAmount];
+
+	-- 3) Training Management:
+
+-- List of employees who have completed a 'Software Quality Assurance' program.
+SELECT
+    E.[EmployeeID],
+    E.[EmployeeName],
+    T.[TrainingName]
+FROM
+    Employees E
+JOIN
+    Training T ON E.[EmployeeID] = T.[EmployeeID]
+WHERE
+    T.[TrainingName] = 'Software Quality Assurance';
+
+-- The training programs have been the most popular among employees.
+
+SELECT
+    T.[TrainingName],
+    COUNT(T.[EmployeeID]) AS ParticipantsCount
+FROM
+    Training T
+GROUP BY
+    T.[TrainingName]
+ORDER BY
+    ParticipantsCount DESC;
+
+-- The total training hours spent by each department.
+
+SELECT
+    D.[DepartmentID],
+    D.[DepartmentName],
+    SUM(T.[TrainingDuration]) AS TotalTrainingHours
+FROM
+    Employees E
+JOIN
+    Training T ON E.[EmployeeID] = T.[EmployeeID]
+JOIN
+    Departments D ON E.[DepartmentID] = D.[DepartmentID]
+GROUP BY
+    D.[DepartmentID],
+    D.[DepartmentName]
+ORDER BY
+    TotalTrainingHours DESC;
+
+	-- 4)Employee Demographics:
+
+--The gender distribution within the organization.
+
+SELECT COUNT([EmployeeID]) AS GenderCount, E.GENDER
+FROM [dbo].[Employees] E
+GROUP BY E.GENDER
+
+
+-- The average age of employees in each department.
+SELECT
+	AVG(DATEDIFF(YEAR, E.[DateOfBirth], GETDATE())) AS AverageAge,
+	D.[DepartmentName],
+	D.[DepartmentID] 
+FROM 
+	[dbo].[Employees] E
+JOIN 
+	[dbo].[Departments] D ON E.[DepartmentID] = D.[DepartmentID]
+GROUP BY
+	D.[DepartmentName],
+	D.[DepartmentID]
+ORDER BY
+	AverageAge DESC;
+
+--Find the employees with the longest tenure.
+
+SELECT TOP 1 WITH TIES
+	E.[EmployeeID],
+	E.[EmployeeName],
+	DATEDIFF(DAY, E.[HireDate], E.[TerminationDate]) AS LongestTenure
+FROM
+	Employees E
+WHERE 
+	DATEDIFF(DAY, E.[HireDate], E.[TerminationDate]) =
+	(SELECT
+		MAX(DATEDIFF(DAY, E.[HireDate], E.[TerminationDate])) FROM Employees E)
+ORDER BY
+	LongestTenure ASC
+
+--Find the employees with the  shortest tenure.
+SELECT TOP 1 WITH TIES
+	E.[EmployeeID],
+	E.[EmployeeName],
+	DATEDIFF(DAY, E.[HireDate], E.[TerminationDate]) AS LongestTenure
+FROM
+	Employees E
+WHERE 
+	DATEDIFF(DAY, E.[HireDate], E.[TerminationDate]) =
+	(SELECT
+		MIN(DATEDIFF(DAY, E.[HireDate], E.[TerminationDate])) FROM Employees E)
+ORDER BY
+	LongestTenure ASC
+
+--5)Department Management:
+
+--Departments with the highest and lowest headcounts.
+
+WITH DepartmentHeadCount AS(
+
+SELECT 
+	COUNT(E.[EmployeeID]) AS HeadCount, D.[DepartmentName]
+FROM 
+	[dbo].[Employees] E
+JOIN 
+	[dbo].[Departments] D ON E.[DepartmentID] = D.[DepartmentID]
+
+GROUP BY 
+	D.[DepartmentName]
+	)
+
+SELECT 
+	DH.HeadCount,
+	DH.[DepartmentName]
+FROM 
+	DepartmentHeadCount DH
+WHERE
+	DH.HeadCount = (SELECT(MAX(HeadCount)) FROM DepartmentHeadCount DH)
+	OR
+	DH.HeadCount = (SELECT(MIN(HeadCount)) FROM DepartmentHeadCount DH)
+
+
+--Calculate the average salary for employees in each department.
+
+SELECT 
+	AVG([SalaryAmount]) AS AvgSalaries,
+	[DepartmentName]
+FROM 
+	[dbo].[Salaries] S
+JOIN 
+	[dbo].[Employees] E ON E.[EmployeeID]=s.[EmployeeID]
+JOIN
+	[dbo].[Departments] D ON D.[DepartmentID]=E.[DepartmentID]
+GROUP BY
+	[DepartmentName]
+
+--6) Employee Turnover Analysis:
+
+--Identify employees who have left the company and the reasons for their termination.
+
+SELECT 
+    [EmployeeID],
+    [EmployeeName],
+    [TerminationDate]
+FROM 
+    [Employees]
+WHERE 
+    [TerminationDate] IS NOT NULL;
+
+--Calculate the tenure rate for each department.
+SELECT 
+    D.[DepartmentName],
+    COUNT(E.[EmployeeID]) AS TotalEmployees,
+    SUM(CASE WHEN E.[TerminationDate] IS NOT NULL THEN 1 ELSE 0 END) AS EmployeesLeft,
+    CASE
+        WHEN COUNT(E.[EmployeeID]) = 0 THEN 0  -- Handle the case where TotalEmployees is zero
+        ELSE (SUM(CASE WHEN E.[TerminationDate] IS NOT NULL THEN 1 ELSE 0 END) * 100.0) / COUNT(E.[EmployeeID])
+    END AS TurnoverRate
+FROM 
+    [Departments] D
+LEFT JOIN
+    [Employees] E ON D.[DepartmentID] = E.[DepartmentID]
+GROUP BY
+    D.[DepartmentName]
+ORDER BY
+	TurnoverRate DESC
+
+--Analyse whether tenure rate is correlated with performance scores.
+
+SELECT 
+    CASE WHEN E.[TerminationDate] IS NOT NULL THEN 'Left' ELSE 'Stayed' END AS EmploymentStatus,
+    AVG(HR.[Performance Score]) AS AveragePerformanceScore,
+    MIN(HR.[Performance Score]) AS MinPerformanceScore,
+    MAX(HR.[Performance Score]) AS MaxPerformanceScore
+FROM 
+    [Employees] E
+JOIN 
+	[dbo].[HR] HR ON E.[EmployeeID]=HR.[EmployeeID]
+GROUP BY
+    CASE WHEN E.[TerminationDate] IS NOT NULL THEN 'Left' ELSE 'Stayed' END;
+
+
+-- 7) Job Title Analysis:
+
+--Determine which job titles have the highest and lowest salaries.
+
+-- Highest Salary Job Title
+
+SELECT 
+    [JobTitleName],
+    MAX([SalaryAmount]) AS HighestSalary
+FROM 
+   [Employees] E
+JOIN
+   [JobTitles] JT  ON JT.[JobTitleID] = E.[JobTitleID]
+JOIN
+    [Salaries] S ON E.[EmployeeID] = S.[EmployeeID]
+GROUP BY
+    [JobTitleName]
+ORDER BY
+    HighestSalary DESC
+
+
+-- Lowest Salary Job Title
+SELECT
+    [JobTitleName],
+    MIN([SalaryAmount]) AS LowestSalary
+FROM 
+   [Employees] E
+JOIN
+   [JobTitles] JT  ON JT.[JobTitleID] = E.[JobTitleID]
+JOIN
+    [Salaries] S ON E.[EmployeeID] = S.[EmployeeID]
+GROUP BY
+    [JobTitleName]
+ORDER BY
+    LowestSalary ASC
+
+
+-- 8) Salary History Tracking:
+
+--Retrieve the salary history for a specific employee.
+SELECT
+    E.[EmployeeName],
+    S.[SalaryAmount],
+    S.[EffectiveDate]
+FROM
+    [Employees] E
+JOIN
+    [Salaries] S ON E.[EmployeeID] = S.[EmployeeID]
+WHERE
+    E.[EmployeeName] = 'Mia Rodriguez'  -- We can replace with the specific employee's name
+ORDER BY
+    S.[EffectiveDate] ASC;  
+
+--Identify any significant salary changes for an employee during their tenure.
+
+WITH SalaryChanges AS (
+    SELECT
+        E.[EmployeeName],
+        S.[SalaryAmount],
+        S.[EffectiveDate],
+        LAG(S.[SalaryAmount]) OVER (PARTITION BY E.[EmployeeID] ORDER BY S.[EffectiveDate]) AS PreviousSalary
+    FROM
+        [Employees] E
+    JOIN
+        [Salaries] S ON E.[EmployeeID] = S.[EmployeeID]
+    WHERE
+        E.[EmployeeName] = 'Mia Rodriguez'  -- We canrReplace with the specific employee's name
+)
+SELECT
+    [EmployeeName],
+    [SalaryAmount] AS CurrentSalary,
+    [EffectiveDate] AS CurrentSalaryEffectiveDate,
+
+    CASE
+        WHEN PreviousSalary IS NULL THEN 'Initial Salary'
+        WHEN [SalaryAmount] > PreviousSalary THEN 'Salary Increase'
+        WHEN [SalaryAmount] < PreviousSalary THEN 'Salary Decrease'
+        ELSE 'No Change'
+    END AS SalaryChangeType,
+    CASE
+        WHEN PreviousSalary IS NOT NULL THEN PreviousSalary
+        ELSE [SalaryAmount]
+    END AS PreviousSalary,
+    CASE
+        WHEN PreviousSalary IS NOT NULL THEN [EffectiveDate]
+        ELSE NULL
+    END AS PreviousSalaryEffectiveDate
+	
+FROM
+    SalaryChanges
+ORDER BY
+    [EffectiveDate] ASC;
+
+	
+
+--Find departments with an average salary greater than $50,000
+WITH AVGSaleryTable AS(
+SELECT 
+	D.[DepartmentName],
+	AVG(S.[SalaryAmount]) AS AverageSalery
+FROM [Departments] D
+JOIN [Employees] E ON E.[DepartmentID]=D.[DepartmentID]
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+GROUP BY D.[DepartmentName]
+)
+SELECT 
+	AVGS.[DepartmentName],
+	AVGS.AverageSalery
+FROM 
+	AVGSaleryTable AVGS
+WHERE 
+ AVGS.AverageSalery > 50000
+
+ -- Departments with salaries greater than $60000
+ SELECT 
+	D.[DepartmentName],
+	AVG(S.[SalaryAmount]) AS AverageSalery
+FROM [Departments] D
+JOIN [Employees] E ON E.[DepartmentID]=D.[DepartmentID]
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+GROUP BY D.[DepartmentName]
+HAVING AVG(S.[SalaryAmount])> 60000
+
+-- Assign a unique row number to each row within a specific partition.
+
+SELECT
+	E.EmployeeName,
+	S.SalaryAmount,
+    ROW_NUMBER() OVER (ORDER BY SalaryAmount DESC) AS RowNum
+FROM Employees E
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+
+-- Rank employees by salary and assign the same rank to employees with equal salaries.
+
+SELECT
+	E.EmployeeName,
+	RANK() OVER (ORDER BY SalaryAmount DESC) AS Rank,
+	DENSE_RANK() OVER (ORDER BY SalaryAmount DESC) AS DenseRank
+FROM Employees E
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+
+-- Divide employees into quartiles based on salary.
+SELECT E.EmployeeName,
+	NTILE(4) OVER (ORDER BY SalaryAmount) AS Quartiles
+FROM Employees E
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+
+-- top Five highest-paid employees in each department
+
+ SELECT TOP 5
+	E.[EmployeeName],
+	DENSE_RANK() OVER (PARTITION BY D.[DepartmentName] ORDER BY SalaryAmount) AS RowN
+FROM [Departments] D
+JOIN [Employees] E ON E.[DepartmentID]=D.[DepartmentID]
+JOIN [Salaries] S ON E.[EmployeeID]=S.[EmployeeID]
+ORDER BY SalaryAmount
